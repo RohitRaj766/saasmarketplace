@@ -5,6 +5,7 @@ import { errorHandler, notFoundHandler } from './common/middleware/error.middlew
 import { AuthController } from './modules/auth/auth.controller';
 import { OrdersController } from './modules/orders/orders.controller';
 import { BillingController } from './modules/billing/billing.controller';
+import { TenantsController } from './modules/tenants/tenants.controller';
 import { authenticate, authorize } from './modules/auth/auth.middleware';
 
 const app = express();
@@ -23,12 +24,17 @@ app.get('/health', (req, res) => {
 const authController = new AuthController();
 const ordersController = new OrdersController();
 const billingController = new BillingController();
+const tenantsController = new TenantsController();
 
 // Auth routes
 app.post('/auth/register', authController.register);
 app.post('/auth/login', authController.login);
 app.post('/auth/refresh', authController.refresh);
 app.post('/auth/logout', authController.logout);
+
+// Tenant routes
+app.get('/tenants', tenantsController.getAllTenants);
+app.get('/tenants/:slug', tenantsController.getTenantBySlug);
 
 // Orders routes
 app.get('/orders', authenticate, ordersController.getOrders);

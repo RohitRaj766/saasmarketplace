@@ -5,33 +5,15 @@ const prisma = new PrismaClient({
 });
 
 // Phase 2: Tenant isolation middleware
-// Uncomment when implementing multi-tenancy
-/*
 prisma.$use(async (params, next) => {
   // Skip for tenant and auth operations
-  if (['Tenant', 'RefreshToken'].includes(params.model || '')) {
+  if (['Tenant', 'RefreshToken', 'User'].includes(params.model || '')) {
     return next(params);
   }
 
-  // Get tenant context from async local storage or request context
-  const tenantId = getTenantContext();
-  
-  if (tenantId && params.model) {
-    if (params.action === 'findMany' || params.action === 'findFirst') {
-      params.args.where = { ...params.args.where, tenantId };
-    }
-    
-    if (params.action === 'create') {
-      params.args.data = { ...params.args.data, tenantId };
-    }
-    
-    if (params.action === 'update' || params.action === 'delete') {
-      params.args.where = { ...params.args.where, tenantId };
-    }
-  }
-
+  // For now, we'll handle tenant filtering in the service layer
+  // This middleware can be enhanced to automatically inject tenantId
   return next(params);
 });
-*/
 
 export default prisma;
