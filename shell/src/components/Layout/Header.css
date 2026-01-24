@@ -17,6 +17,13 @@
   font-weight: 600;
 }
 
+.header-tenant-slug {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin-left: 0.5rem;
+  font-weight: 400;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
