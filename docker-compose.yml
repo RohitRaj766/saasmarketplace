@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: saas-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-saas_dashboard}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: saas-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-saas_dashboard}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  shell:
+    build:
+      context: ./shell
+      dockerfile: Dockerfile
+    container_name: saas-shell
+    environment:
+      VITE_API_URL: http://localhost:4000
+      VITE_ORDERS_MFE_URL: http://localhost:3001
+      VITE_BILLING_MFE_URL: http://localhost:3002
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./shell:/app
+      - /app/node_modules
+    command: npm run dev
+
+  orders-mfe:
+    build:
+      context: ./orders-mfe
+      dockerfile: Dockerfile
+    container_name: saas-orders-mfe
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./orders-mfe:/app
+      - /app/node_modules
+    command: npm run dev
+
+  billing-mfe:
+    build:
+      context: ./billing-mfe
+      dockerfile: Dockerfile
+    container_name: saas-billing-mfe
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./billing-mfe:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:

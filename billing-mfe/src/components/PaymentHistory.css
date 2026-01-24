@@ -1,0 +1,59 @@
+.payment-history {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payment-table thead {
+  background-color: #f5f5f5;
+}
+
+.payment-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.payment-table td {
+  padding: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.transaction-id {
+  font-family: monospace;
+  color: #666;
+}
+
+.amount {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.loading,
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+  background: white;
+  border-radius: 8px;
+}

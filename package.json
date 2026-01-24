@@ -1,0 +1,15 @@
+{
+  "name": "saas-marketplace-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter shell dev\" \"pnpm --filter orders-mfe dev\" \"pnpm --filter billing-mfe dev\" \"pnpm --filter backend dev\"",
+    "build": "pnpm --filter shell build && pnpm --filter orders-mfe build && pnpm --filter billing-mfe build && pnpm --filter backend build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose up --build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

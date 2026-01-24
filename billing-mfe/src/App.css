@@ -1,0 +1,44 @@
+.billing-app {
+  width: 100%;
+}
+
+.billing-header {
+  margin-bottom: 2rem;
+}
+
+.billing-header h1 {
+  font-size: 1.75rem;
+  color: #1a1a1a;
+}
+
+.billing-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: #1976d2;
+}
+
+.tab.active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+}
+
+.billing-content {
+  min-height: 400px;
+}
