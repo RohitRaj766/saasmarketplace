@@ -15,7 +15,7 @@ export class TenantsController {
     }
   }
 
-  async getAllTenants(req: Request, res: Response, next: NextFunction) {
+  async getAllTenants(_req: Request, res: Response, next: NextFunction) {
     try {
       const tenants = await tenantsService.getAllTenants();
       return ResponseUtil.success(res, tenants);

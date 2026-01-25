@@ -8,13 +8,23 @@ export default defineConfig({
     federation({
       name: 'shell',
       remotes: {
-        orders: {
+        orders_mfe: {
           external: 'http://localhost:3001/assets/remoteEntry.js',
           format: 'esm',
           from: 'vite'
         },
-        billing: {
+        billing_mfe: {
           external: 'http://localhost:3002/assets/remoteEntry.js',
+          format: 'esm',
+          from: 'vite'
+        },
+        analytics_mfe: {
+          external: 'http://localhost:3003/assets/remoteEntry.js',
+          format: 'esm',
+          from: 'vite'
+        },
+        admin_mfe: {
+          external: 'http://localhost:3004/assets/remoteEntry.js',
           format: 'esm',
           from: 'vite'
         }

@@ -1,337 +1,336 @@
-# 🚀 SaaS Marketplace Dashboard
+# OptiFlow - Enterprise SaaS Operations Platform
 
-> A production-grade SaaS dashboard platform built with **Micro-Frontend architecture** using Module Federation, designed to scale into a **Multi-Tenant system**.
+> A production-ready SaaS platform built with Micro-Frontend architecture, featuring multi-tenancy, feature flags, and dynamic module loading.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.2-61dafb)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-18.2-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ed)](https://www.docker.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-brightgreen)](https://www.prisma.io/)
+[![Vite](https://img.shields.io/badge/Vite-5.0-purple)](https://vitejs.dev/)
 
-## 📋 Table of Contents
+## 🎯 Overview
 
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Documentation](#-documentation)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
+OptiFlow is a comprehensive SaaS operations management platform demonstrating enterprise-grade patterns:
+
+- **4 Micro-Frontends:** Orders, Billing, Analytics, Admin
+- **Multi-Tenancy:** Database-level isolation with 2 production tenants
+- **Feature Flags:** Subscription-based module access
+- **Dynamic Loading:** Runtime MFE integration via Module Federation
+- **Production Data:** 20 users, realistic transactional data
 
 ## ✨ Features
 
-### Phase 1: Micro-Frontend (Current)
-- ✅ **Shell Application** - Centralized auth, routing, and layout
-- ✅ **Orders MFE** - Independent orders management module
-- ✅ **Billing MFE** - Standalone billing and invoicing module
-- ✅ **JWT Authentication** - Secure auth with refresh tokens
-- ✅ **RESTful API** - Clean architecture backend
-- ✅ **Docker Support** - Containerized development environment
-- ✅ **TypeScript** - Full type safety across the stack
+### 🏢 Multi-Tenant Architecture
+- **Atlassian** (Professional Tier): Orders + Billing + Analytics
+- **Zoho** (Starter Tier): Orders + Admin
+- Database-level tenant isolation
+- Custom branding per tenant
 
-### Phase 2: Multi-Tenant (Planned)
-- 📋 **Tenant Isolation** - Data segregation per tenant
-- 📋 **Tenant Routing** - `/t/{tenant}/orders` URL structure
-- 📋 **Feature Flags** - Enable/disable features per tenant
-- 📋 **RBAC** - Role-based access control
-- 📋 **Custom Theming** - Branding per tenant
-- 📋 **Admin Dashboard** - Tenant management interface
+### 📦 Micro-Frontends
+1. **Orders MFE** - Order management and tracking
+2. **Billing MFE** - Invoices and payment history
+3. **Analytics MFE** - Business intelligence with charts
+4. **Admin MFE** - Team management and activity logs
 
-## 🏗️ Architecture
+### 🔐 Security & Auth
+- JWT-based authentication
+- Role-based access control (Admin, Manager, User)
+- Tenant context in tokens
+- Password hashing with bcrypt
 
-### System Overview
+### 📊 Analytics & Reporting
+- Revenue trend charts
+- Order status tracking
+- Team performance metrics
+- Date range filtering
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Browser                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              Shell App (React + Vite)                  │  │
-│  │  • Authentication  • Routing  • Layout                 │  │
-│  │  • Module Federation Host                              │  │
-│  └───────────────┬──────────────────┬─────────────────────┘  │
-│                  │                  │                         │
-│     ┌────────────▼─────────┐  ┌────▼──────────────┐         │
-│     │   Orders MFE         │  │   Billing MFE     │         │
-│     │   Port: 3001         │  │   Port: 3002      │         │
-│     └──────────────────────┘  └───────────────────┘         │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              │ REST API (JWT)
-                              │
-                    ┌─────────▼──────────┐
-                    │   Backend API      │
-                    │   Port: 4000       │
-                    │   • Auth Service   │
-                    │   • Orders API     │
-                    │   • Billing API    │
-                    └─────────┬──────────┘
-                              │
-                    ┌─────────▼──────────┐
-                    │   PostgreSQL       │
-                    │   Port: 5432       │
-                    └────────────────────┘
-```
-
-### Module Federation Flow
-
-```
-Shell (Host)
-    ↓ loads
-Orders MFE (Remote) ←→ Shared Dependencies (React, React-DOM)
-    ↓ loads
-Billing MFE (Remote) ←→ Singleton Pattern
-```
+### 👥 Team Management
+- User invitation system
+- Role management
+- Activity timeline
+- Audit logging
 
 ## 🚀 Quick Start
 
-### ⚠️ Important: MFE Setup Required
-
-The Micro-Frontends (Orders and Billing) must be **built first** before running. 
-
-**👉 [START HERE - Complete Setup Guide](./START_HERE.md)**
-
-### Quick Commands
-
+### Prerequisites
 ```bash
-# 1. Build MFEs (required first time)
-cd orders-mfe && npm run build
-cd ../billing-mfe && npm run build
-
-# 2. Start all services (4 terminals)
-cd orders-mfe && npm run preview      # Terminal 1
-cd billing-mfe && npm run preview     # Terminal 2  
-cd backend && npm run dev             # Terminal 3
-cd shell && npm run dev               # Terminal 4
-
-# 3. Access at http://localhost:3000
-# Login: admin@example.com / password123
+Node.js 18+
+PostgreSQL
+npm or yarn
 ```
 
-**Detailed guides:**
-- 📖 [START_HERE.md](./START_HERE.md) - Quick setup (start here!)
-- 📖 [MFE_SETUP.md](./MFE_SETUP.md) - Micro-Frontend details
-- 📖 [GETTING_STARTED.md](./GETTING_STARTED.md) - Complete walkthrough
-- 📖 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues
+### Installation
 
-## 🛠️ Tech Stack
+1. **Clone and Install**
+```bash
+git clone <repository-url>
+cd SaasMarketplace
 
-### Frontend
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| React | UI Framework | 18.2 |
-| TypeScript | Type Safety | 5.3 |
-| Vite | Build Tool | 5.0 |
-| Module Federation | Micro-Frontend | 1.3 |
-| TanStack Query | Data Fetching | 5.14 |
-| Zustand | State Management | 4.4 |
-| React Router | Routing | 6.20 |
+# Install all dependencies
+npm install --prefix backend
+npm install --prefix shell
+npm install --prefix orders-mfe
+npm install --prefix billing-mfe
+npm install --prefix analytics-mfe
+npm install --prefix admin-mfe
+```
 
-### Backend
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| Node.js | Runtime | 18+ |
-| Express | Web Framework | 4.18 |
-| TypeScript | Type Safety | 5.3 |
-| Prisma | ORM | 5.7 |
-| PostgreSQL | Database | 15 |
-| JWT | Authentication | 9.0 |
-| Bcrypt | Password Hashing | 2.4 |
+2. **Database Setup**
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your DATABASE_URL
 
-### DevOps
-| Technology | Purpose |
-|------------|---------|
-| Docker | Containerization |
-| Docker Compose | Orchestration |
-| GitHub Actions | CI/CD |
-| AWS | Cloud Platform |
+# Run migrations and seed
+npx prisma migrate dev
+npx tsx prisma/seed-production.ts
+```
+
+3. **Start Everything**
+
+**One Command Startup (Easiest):**
+
+Windows:
+```bash
+start-all.bat
+```
+
+Linux/Mac:
+```bash
+chmod +x start-all.sh
+./start-all.sh
+```
+
+This will:
+- Build all 4 MFEs
+- Start all MFE preview servers
+- Start the backend API
+- Start the Shell application
+
+Wait 10-15 seconds for all services to start, then open http://localhost:3000
+
+**Manual Startup (If needed):**
+```bash
+# Terminal 1: All MFEs
+start-mfe-dev.bat  # Windows
+./start-mfe-dev.sh # Linux/Mac
+
+# Terminal 2: Backend
+cd backend && npm run dev
+
+# Terminal 3: Shell
+cd shell && npm run dev
+```
+
+4. **Access Application**
+```
+http://localhost:3000
+```
+
+## 🔐 Test Accounts
+
+### Atlassian (Professional Tier)
+**Features:** Orders + Billing + Analytics
+
+| Email | Password | Role |
+|-------|----------|------|
+| mike.cannon@atlassian.com | password123 | Admin |
+| sarah.chen@atlassian.com | password123 | Manager |
+| emma.wilson@atlassian.com | password123 | User |
+
+### Zoho (Starter Tier)
+**Features:** Orders + Admin
+
+| Email | Password | Role |
+|-------|----------|------|
+| sridhar.vembu@zoho.com | password123 | Admin |
+| priya.sharma@zoho.com | password123 | Manager |
+| neha.reddy@zoho.com | password123 | User |
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────┐
+│         Shell Application               │
+│      (React + Vite + Router)            │
+│           Port: 3000                    │
+└─────────────────────────────────────────┘
+                  │
+                  │ Module Federation
+                  │
+    ┌─────────────┼─────────────┐
+    │             │             │
+    ▼             ▼             ▼
+┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Orders  │  │ Billing │  │Analytics│
+│  :3001  │  │  :3002  │  │  :3003  │
+└─────────┘  └─────────┘  └─────────┘
+                  │
+                  ▼
+            ┌─────────┐
+            │  Admin  │
+            │  :3004  │
+            └─────────┘
+                  │
+                  ▼
+            ┌─────────┐
+            │ Backend │
+            │  :5000  │
+            └─────────┘
+                  │
+                  ▼
+            ┌─────────┐
+            │   DB    │
+            └─────────┘
+```
 
 ## 📁 Project Structure
 
 ```
-saas-marketplace-dashboard/
-├── 📂 shell/                    # Host application
-│   ├── src/
-│   │   ├── components/         # Shared components
-│   │   ├── contexts/           # React contexts
-│   │   ├── lib/                # Utilities
-│   │   ├── pages/              # Page components
-│   │   └── types/              # TypeScript types
-│   ├── vite.config.ts          # Module Federation config
-│   └── package.json
-│
-├── 📂 orders-mfe/              # Orders micro-frontend
-│   ├── src/
-│   │   ├── components/         # Order components
-│   │   ├── types/              # Order types
-│   │   └── App.tsx             # Exposed module
-│   └── vite.config.ts          # Remote config
-│
-├── 📂 billing-mfe/             # Billing micro-frontend
-│   ├── src/
-│   │   ├── components/         # Billing components
-│   │   ├── types/              # Billing types
-│   │   └── App.tsx             # Exposed module
-│   └── vite.config.ts          # Remote config
-│
-├── 📂 backend/                 # Backend API
-│   ├── src/
-│   │   ├── modules/            # Feature modules
-│   │   │   ├── auth/           # Authentication
-│   │   │   ├── orders/         # Orders API
-│   │   │   └── billing/        # Billing API
-│   │   ├── common/             # Shared utilities
-│   │   ├── config/             # Configuration
-│   │   └── prisma/             # Database schema
-│   └── package.json
-│
-├── 📄 ARCHITECTURE.md          # System design docs
-├── 📄 SETUP.md                 # Setup guide
-├── 📄 DEPLOYMENT.md            # Deployment guide
-├── 📄 PHASE2_UPGRADE.md        # Multi-tenant upgrade
-├── 📄 PROJECT_SUMMARY.md       # Project overview
-├── 📄 docker-compose.yml       # Docker orchestration
-└── 📄 package.json             # Root workspace
+SaasMarketplace/
+├── backend/              # Node.js + Express + Prisma
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── seed-production.ts
+│   └── src/
+│       ├── modules/
+│       │   ├── auth/
+│       │   ├── orders/
+│       │   ├── billing/
+│       │   └── tenants/
+│       └── app.ts
+├── shell/                # React Shell (Host)
+│   └── src/
+│       ├── contexts/
+│       ├── components/
+│       └── pages/
+├── orders-mfe/           # Orders Micro-Frontend
+├── billing-mfe/          # Billing Micro-Frontend
+├── analytics-mfe/        # Analytics Micro-Frontend
+├── admin-mfe/            # Admin Micro-Frontend
+└── docs/                 # Documentation
 ```
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework:** React 18 with TypeScript
+- **Build Tool:** Vite 5
+- **Module Federation:** @originjs/vite-plugin-federation
+- **State Management:** React Context + React Query
+- **Routing:** React Router v6
+- **Charts:** Recharts
+- **Styling:** CSS Modules
+
+### Backend
+- **Runtime:** Node.js 18+
+- **Framework:** Express.js
+- **ORM:** Prisma 5
+- **Database:** PostgreSQL
+- **Authentication:** JWT (jsonwebtoken)
+- **Password Hashing:** bcryptjs
+
+### DevOps
+- **Containerization:** Docker + Docker Compose
+- **Database Migrations:** Prisma Migrate
+- **Environment Management:** dotenv
+
+## 📊 Database Schema
+
+- **tenants** - Tenant configuration and subscriptions
+- **tenant_features** - Module subscriptions per tenant
+- **users** - User accounts with tenant association
+- **refresh_tokens** - JWT refresh token management
+- **orders** - Order management (tenant-isolated)
+- **invoices** - Billing and invoices (tenant-isolated)
+- **audit_logs** - Activity tracking and compliance
+- **usage_metrics** - Analytics and usage data
+
+## 🧪 Testing
+
+### Feature Flag Testing
+1. Login as Atlassian user → See Orders, Billing, Analytics
+2. Login as Zoho user → See Orders, Team (no Billing/Analytics)
+
+### Analytics Testing
+1. Login as Atlassian user
+2. Navigate to Analytics
+3. View dashboard metrics
+4. Check revenue and order charts
+5. Review team performance
+
+### Admin Testing
+1. Login as Zoho admin
+2. Navigate to Team
+3. View team members
+4. Invite new user
+5. Update user role
+6. Check activity logs
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture, patterns, and design decisions |
-| [SETUP.md](./SETUP.md) | Detailed development setup instructions |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Production deployment guide |
-| [PHASE2_UPGRADE.md](./PHASE2_UPGRADE.md) | Multi-tenancy upgrade path |
-| [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) | Comprehensive project overview |
+- **[COMPLETE_PROJECT_SUMMARY.md](./COMPLETE_PROJECT_SUMMARY.md)** - Full project overview
+- **[QUICK_START_GUIDE.md](./QUICK_START_GUIDE.md)** - 5-minute setup
+- **[NEW_MFES_GUIDE.md](./NEW_MFES_GUIDE.md)** - Analytics & Admin MFE guide
+- **[PHASE2_UPGRADE.md](./PHASE2_UPGRADE.md)** - Multi-tenancy details
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture
+- **[PRODUCT_REQUIREMENTS.md](./PRODUCT_REQUIREMENTS.md)** - Product vision
+- **[DATABASE_SCHEMA_SAAS.md](./DATABASE_SCHEMA_SAAS.md)** - Database design
+- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Common issues
 
-## 💻 Development
+## 🎯 Key Features Implemented
 
-### Available Scripts
+✅ Multi-tenant database with tenant isolation  
+✅ Feature flag system (module subscriptions)  
+✅ Dynamic navigation based on features  
+✅ Tenant branding (name, subscription tier)  
+✅ Role-based access control  
+✅ JWT authentication with tenant context  
+✅ Micro-frontend architecture  
+✅ Module Federation for runtime loading  
+✅ Audit logging system  
+✅ Usage metrics tracking  
+✅ Analytics with interactive charts  
+✅ Team management with activity logs  
 
+## 🚧 Troubleshooting
+
+### MFE not loading (404 on remoteEntry.js)
+**Solution:** MFEs must be built and run in preview mode
 ```bash
-# Root directory
-pnpm dev              # Start all services
-pnpm build            # Build all services
-pnpm docker:up        # Start with Docker
-pnpm docker:down      # Stop Docker services
-
-# Backend
-cd backend
-pnpm dev              # Start dev server
-pnpm build            # Build for production
-pnpm prisma:studio    # Open Prisma Studio
-pnpm seed             # Seed database
-
-# Frontend (shell/orders-mfe/billing-mfe)
-cd shell
-pnpm dev              # Start dev server
-pnpm build            # Build for production
-pnpm preview          # Preview production build
+cd orders-mfe && npm run build && npm run preview
 ```
 
-### Database Management
-
+### Login fails
+**Solution:** Ensure seed script was run
 ```bash
-# Generate Prisma client
-pnpm prisma:generate
-
-# Create migration
-pnpm prisma migrate dev --name migration_name
-
-# View database
-pnpm prisma studio
-
-# Seed data
-pnpm seed
+cd backend && npx tsx prisma/seed-production.ts
 ```
 
-### Testing MFEs Independently
+### Database connection error
+**Solution:** Check DATABASE_URL in `backend/.env`
 
-Each MFE can run standalone for development:
+### Port already in use
+**Solution:** Kill processes on ports 3000-3004, 5000
 
-```bash
-# Orders MFE standalone
-cd orders-mfe && pnpm dev
-# Open http://localhost:3001
+## 🎓 Learning Resources
 
-# Billing MFE standalone
-cd billing-mfe && pnpm dev
-# Open http://localhost:3002
-```
-
-## 🚢 Deployment
-
-### Docker Production Build
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Access at http://localhost:3000
-```
-
-### AWS Deployment
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed AWS deployment instructions including:
-- S3 + CloudFront for frontend
-- ECS Fargate for backend
-- RDS PostgreSQL for database
-- CI/CD with GitHub Actions
-
-## 🎯 Roadmap
-
-### ✅ Phase 1: Micro-Frontend (Completed)
-- Shell application with routing
-- Orders and Billing MFEs
-- Backend API with authentication
-- Docker development environment
-
-### 🚧 Phase 2: Multi-Tenancy (In Progress)
-- Tenant-based data isolation
-- Tenant-aware routing
-- Feature flags system
-- RBAC implementation
-- Custom theming engine
-- Admin dashboard
-
-### 📋 Phase 3: Advanced Features (Planned)
-- Real-time notifications
-- Analytics dashboard
-- Payment gateway integration
-- Email service integration
-- Mobile app (React Native)
-- Advanced reporting
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- [Module Federation](https://webpack.js.org/concepts/module-federation/)
+- [Micro-Frontends](https://martinfowler.com/articles/micro-frontends.html)
+- [Multi-Tenancy](https://docs.microsoft.com/en-us/azure/architecture/guide/multitenant/approaches/overview)
+- [Prisma ORM](https://www.prisma.io/docs)
+- [Recharts](https://recharts.org/)
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT
 
-## 🙏 Acknowledgments
+## 👥 Contributors
 
-- Built with modern web technologies
-- Inspired by real-world SaaS architectures
-- Designed for scalability and maintainability
-
-## 📧 Contact
-
-For questions or support:
-- Create an issue in the repository
-- Review documentation in `/docs`
-- Check [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for overview
+Built as a demonstration of enterprise SaaS architecture patterns.
 
 ---
 
-**⭐ Star this repo if you find it helpful!**
-
-Built with ❤️ using React, TypeScript, and Module Federation
+**Status:** ✅ Production Ready  
+**Version:** 1.0.0  
+**Last Updated:** January 25, 2026

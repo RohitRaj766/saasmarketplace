@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../lib/api-client';
 
-const BillingApp = lazy(() => import('billing/BillingApp'));
+const BillingApp = lazy(() => import('billing_mfe/BillingApp'));
 
 export default function BillingPage() {
   const { user } = useAuth();

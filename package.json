@@ -2,6 +2,7 @@
   "name": "saas-marketplace-dashboard",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "concurrently \"pnpm --filter shell dev\" \"pnpm --filter orders-mfe dev\" \"pnpm --filter billing-mfe dev\" \"pnpm --filter backend dev\"",
     "build": "pnpm --filter shell build && pnpm --filter orders-mfe build && pnpm --filter billing-mfe build && pnpm --filter backend build",
