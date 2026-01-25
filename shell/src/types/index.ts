@@ -4,7 +4,9 @@ export interface User {
   firstName: string;
   lastName: string;
   role: string;
-  tenantId?: string; // Phase 2
+  tenantId?: string;
+  department?: string;
+  jobTitle?: string;
 }
 
 export interface AuthTokens {
@@ -29,9 +31,9 @@ export interface Tenant {
   name: string;
   slug: string;
   domain?: string;
-  settings: Record<string, any>;
+  subscriptionTier: string;
+  subscriptionStatus: string;
   theme: TenantTheme;
-  features: Record<string, boolean>;
 }
 
 export interface TenantTheme {
@@ -40,3 +42,12 @@ export interface TenantTheme {
   logo?: string;
   favicon?: string;
 }
+
+export interface LoginResponse {
+  user: User;
+  features: string[];
+  tenant: Tenant | null;
+  accessToken: string;
+  refreshToken: string;
+}
+

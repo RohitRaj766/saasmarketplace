@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../lib/api-client';
 
-const OrdersApp = lazy(() => import('orders/OrdersApp'));
+const OrdersApp = lazy(() => import('orders_mfe/OrdersApp'));
 
 export default function OrdersPage() {
   const { user } = useAuth();

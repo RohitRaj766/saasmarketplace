@@ -45,8 +45,14 @@ export class TenantsService {
   }
 
   async checkFeatureEnabled(tenantId: string, featureKey: string): Promise<boolean> {
-    const tenant = await this.getTenantById(tenantId);
-    const features = tenant.features as any;
-    return features[featureKey] === true;
+    const feature = await prisma.tenantFeature.findUnique({
+      where: {
+        tenantId_featureKey: {
+          tenantId,
+          featureKey
+        }
+      }
+    });
+    return feature?.isEnabled === true;
   }
 }

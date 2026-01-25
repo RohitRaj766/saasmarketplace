@@ -46,6 +46,15 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await prisma.user.findUnique({
       where: { email },
+      include: {
+        tenant: {
+          include: {
+            tenantFeatures: {
+              where: { isEnabled: true }
+            }
+          }
+        }
+      }
     });
 
     if (!user) {
@@ -60,6 +69,9 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user);
 
+    // Extract enabled features
+    const features = user.tenant?.tenantFeatures.map(f => f.featureKey) || [];
+
     return {
       user: {
         id: user.id,
@@ -67,15 +79,26 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        tenantId: user.tenantId, // Phase 2
+        tenantId: user.tenantId,
+        department: user.department,
+        jobTitle: user.jobTitle,
       },
+      features,
+      tenant: user.tenant ? {
+        id: user.tenant.id,
+        name: user.tenant.name,
+        slug: user.tenant.slug,
+        subscriptionTier: user.tenant.subscriptionTier,
+        subscriptionStatus: user.tenant.subscriptionStatus,
+        theme: user.tenant.theme,
+      } : null,
       ...tokens,
     };
   }
 
   async refreshToken(refreshToken: string) {
     try {
-      const decoded = jwt.verify(refreshToken, config.refreshToken.secret) as any;
+      jwt.verify(refreshToken, config.refreshToken.secret) as any;
 
       const storedToken = await prisma.refreshToken.findUnique({
         where: { token: refreshToken },
@@ -113,17 +136,19 @@ export class AuthService {
         userId: user.id,
         email: user.email,
         role: user.role,
-        tenantId: user.tenantId, // Phase 2
+        tenantId: user.tenantId,
       },
       config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
     );
   }
 
   private async generateRefreshToken(userId: string) {
-    const token = jwt.sign({ userId }, config.refreshToken.secret, {
-      expiresIn: config.refreshToken.expiresIn,
-    });
+    const token = jwt.sign(
+      { userId }, 
+      config.refreshToken.secret, 
+      { expiresIn: config.refreshToken.expiresIn } as jwt.SignOptions
+    );
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
