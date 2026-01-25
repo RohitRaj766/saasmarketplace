@@ -5,6 +5,8 @@ import { TenantProvider } from './contexts/TenantContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';
+import Landing from './pages/Landing';
+import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import OrdersPage from './pages/OrdersPage';
@@ -30,16 +32,18 @@ function App() {
           <TenantProvider>
             <BrowserRouter>
               <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route
-                  path="/"
+                  path="/app"
                   element={
                     <ProtectedRoute>
                       <Layout />
                     </ProtectedRoute>
                   }
                 >
-                  <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Route index element={<Navigate to="/app/dashboard" replace />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="orders/*" element={<OrdersPage />} />
                   <Route path="billing/*" element={<BillingPage />} />

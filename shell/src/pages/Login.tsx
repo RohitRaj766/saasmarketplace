@@ -29,9 +29,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background">
       {/* Left side - Form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -40,13 +40,13 @@ export default function Login() {
         >
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 mb-4 shadow-lg">
-              <span className="text-white font-bold text-2xl">O</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 mb-4 shadow-lg">
+              <span className="text-primary-foreground font-bold text-2xl">O</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-foreground">
               Welcome back
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-muted-foreground">
               Sign in to your OptiFlow account
             </p>
           </div>
@@ -103,14 +103,14 @@ export default function Login() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-foreground">
                   Remember me
                 </label>
               </div>
 
-              <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
+              <a href="#" className="text-sm font-medium text-primary hover:text-primary/80">
                 Forgot password?
               </a>
             </div>
@@ -121,6 +121,7 @@ export default function Login() {
               size="lg"
               fullWidth
               isLoading={isLoading}
+              className="mt-6"
             >
               Sign in
             </Button>
@@ -131,21 +132,21 @@ export default function Login() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="mt-8 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+            className="mt-8 p-4 rounded-lg bg-primary/5 border border-primary/20"
           >
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+            <p className="text-sm font-semibold text-foreground mb-2">
               Demo Credentials
             </p>
-            <div className="space-y-1 text-sm text-blue-700 dark:text-blue-400">
-              <p><strong>Atlassian:</strong> admin@atlassian.com / password123</p>
-              <p><strong>Zoho:</strong> admin@zoho.com / password123</p>
+            <div className="space-y-1 text-sm text-muted-foreground">
+              <p><strong className="text-foreground">Atlassian:</strong> admin@atlassian.com / password123</p>
+              <p><strong className="text-foreground">Zoho:</strong> admin@zoho.com / password123</p>
             </div>
           </motion.div>
         </motion.div>
       </div>
 
       {/* Right side - Branding */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -154,7 +155,7 @@ export default function Login() {
           }} />
         </div>
 
-        <div className="relative flex flex-col justify-center px-12 text-white z-10">
+        <div className="relative flex flex-col justify-center px-12 text-primary-foreground z-10">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -163,7 +164,7 @@ export default function Login() {
             <h2 className="text-4xl font-bold mb-4">
               Welcome to OptiFlow
             </h2>
-            <p className="text-xl text-primary-100 mb-8">
+            <p className="text-xl opacity-90 mb-8">
               The modern operations platform for growing teams
             </p>
 
@@ -183,7 +184,7 @@ export default function Login() {
                   transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                   className="flex items-start"
                 >
-                  <svg className="w-6 h-6 mr-3 flex-shrink-0 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 mr-3 flex-shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-lg">{feature}</span>

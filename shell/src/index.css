@@ -5,8 +5,90 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* DaisyUI Emerald Theme (Light Mode) */
+    --background: 0 0% 100%; /* base-100 */
+    --foreground: 262.988 8.26% 35.519%; /* base-content */
+    
+    --card: 0 0% 93%; /* base-200 */
+    --card-foreground: 262.988 8.26% 35.519%;
+    
+    --muted: 0 0% 86%; /* base-300 */
+    --muted-foreground: 262.988 8.26% 35.519%;
+    
+    --primary: 153.45 49.63% 76.662%; /* emerald green */
+    --primary-foreground: 162.24 10.71% 33.387%;
+    
+    --secondary: 261.294 45.45% 61.302%; /* purple */
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 33.2 48.39% 72.772%; /* orange */
+    --accent-foreground: 0 0% 0%;
+    
+    --success: 160 60% 64.8%;
+    --success-foreground: 0 0% 0%;
+    
+    --warning: 83.87 100% 84.71%;
+    --warning-foreground: 0 0% 0%;
+    
+    --error: 22.18 100% 71.76%;
+    --error-foreground: 0 0% 0%;
+    
+    --info: 231.6 100% 72.06%;
+    --info-foreground: 0 0% 0%;
+    
+    --border: 0 0% 86%;
+    --input: 0 0% 86%;
+    --ring: 153.45 49.63% 76.662%;
+    
+    --radius: 1rem;
+  }
+  
+  .dark {
+    /* DaisyUI Business Theme (Dark Mode) */
+    --background: 0 0% 24.353%; /* base-100 */
+    --foreground: 0 0% 84.87%; /* base-content */
+    
+    --card: 0 0% 22.648%; /* base-200 */
+    --card-foreground: 0 0% 84.87%;
+    
+    --muted: 0 0% 20.944%; /* base-300 */
+    --muted-foreground: 0 0% 84.87%;
+    
+    --primary: 251.473 100% 41.703%; /* blue */
+    --primary-foreground: 251.473 100% 88.34%;
+    
+    --secondary: 229.389 100% 64.092%; /* light blue */
+    --secondary-foreground: 229.389 100% 12.818%;
+    
+    --accent: 35.791 100% 67.271%; /* orange */
+    --accent-foreground: 35.791 100% 13.454%;
+    
+    --success: 156.596 100% 70.226%;
+    --success-foreground: 156.596 100% 14.045%;
+    
+    --warning: 81.519 100% 77.482%;
+    --warning-foreground: 81.519 100% 15.496%;
+    
+    --error: 29.674 100% 51.61%;
+    --error-foreground: 29.674 100% 90.322%;
+    
+    --info: 240.033 100% 62.616%;
+    --info-foreground: 240.033 100% 12.523%;
+    
+    --border: 0 0% 27.441%;
+    --input: 0 0% 27.441%;
+    --ring: 251.473 100% 41.703%;
+    
+    --radius: 0.25rem;
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
   body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
