@@ -6,13 +6,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <div>Loading...</div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
