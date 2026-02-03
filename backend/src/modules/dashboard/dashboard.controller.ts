@@ -10,7 +10,7 @@ export class DashboardController {
     try {
       const metrics = await dashboardService.getMetrics(
         req.user!.userId,
-        req.user!.tenantId
+        req.user!.organizationId
       );
       return ResponseUtil.success(res, metrics);
     } catch (error) {
@@ -23,7 +23,7 @@ export class DashboardController {
       const limit = parseInt(req.query.limit as string) || 10;
       const activities = await dashboardService.getRecentActivity(
         req.user!.userId,
-        req.user!.tenantId,
+        req.user!.organizationId,
         limit
       );
       return ResponseUtil.success(res, activities);

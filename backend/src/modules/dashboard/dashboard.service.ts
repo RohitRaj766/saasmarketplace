@@ -3,22 +3,22 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export class DashboardService {
-  async getMetrics(userId: string, tenantId: string) {
+  async getMetrics(userId: string, organizationId: string) {
     const now = new Date();
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
     const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate());
 
-    // Get current month data
+    // Get current month data (filtered by organization)
     const [currentOrders, currentInvoices] = await Promise.all([
       prisma.order.findMany({
         where: {
-          userId,
+          organizationId,
           createdAt: { gte: lastMonth },
         },
       }),
       prisma.invoice.findMany({
         where: {
-          userId,
+          organizationId,
           createdAt: { gte: lastMonth },
         },
       }),
@@ -28,22 +28,22 @@ export class DashboardService {
     const [previousOrders, previousInvoices] = await Promise.all([
       prisma.order.findMany({
         where: {
-          userId,
+          organizationId,
           createdAt: { gte: twoMonthsAgo, lt: lastMonth },
         },
       }),
       prisma.invoice.findMany({
         where: {
-          userId,
+          organizationId,
           createdAt: { gte: twoMonthsAgo, lt: lastMonth },
         },
       }),
     ]);
 
     // Calculate metrics
-    const totalOrders = await prisma.order.count({ where: { userId } });
+    const totalOrders = await prisma.order.count({ where: { organizationId } });
     const pendingInvoices = await prisma.invoice.count({
-      where: { userId, status: { in: ['unpaid', 'pending'] } },
+      where: { organizationId, status: { in: ['unpaid', 'pending'] } },
     });
 
     // Calculate revenue from paid invoices (convert Decimal to number)
@@ -68,18 +68,18 @@ export class DashboardService {
     const previousPendingCount = previousInvoices.filter(inv => ['unpaid', 'pending'].includes(inv.status)).length;
     const invoiceChange = currentPendingCount - previousPendingCount;
 
-    // Get unique team members (users in the organization)
+    // Get total team members count (all users in the organization)
     const activeMembers = await prisma.user.count({
       where: { 
         organizationId,
-        createdAt: { gte: lastMonth },
       },
     });
 
+    // Get members from previous period for comparison
     const previousMembers = await prisma.user.count({
       where: { 
         organizationId,
-        createdAt: { gte: twoMonthsAgo, lt: lastMonth },
+        createdAt: { lt: lastMonth },
       },
     });
 
@@ -97,10 +97,10 @@ export class DashboardService {
     };
   }
 
-  async getRecentActivity(userId: string, tenantId: string, limit: number = 10) {
-    // Get recent orders
+  async getRecentActivity(userId: string, organizationId: string, limit: number = 10) {
+    // Get recent orders (filtered by organization)
     const recentOrders = await prisma.order.findMany({
-      where: { userId },
+      where: { organizationId },
       orderBy: { createdAt: 'desc' },
       take: limit,
       select: {
@@ -110,9 +110,9 @@ export class DashboardService {
       },
     });
 
-    // Get recent invoices
+    // Get recent invoices (filtered by organization)
     const recentInvoices = await prisma.invoice.findMany({
-      where: { userId },
+      where: { organizationId },
       orderBy: { createdAt: 'desc' },
       take: limit,
       select: {
