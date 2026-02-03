@@ -18,16 +18,12 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
 
     req.user = {
       userId: decoded.userId,
+      organizationId: decoded.organizationId,
       email: decoded.email,
       role: decoded.role,
-      tenantId: decoded.tenantId, // Phase 2
+      isOwner: decoded.isOwner || false,
+      tenantId: decoded.tenantId, // Legacy support
     };
-
-    // Phase 2: Validate tenant header matches JWT
-    const tenantHeader = req.headers['x-tenant-id'] as string;
-    if (decoded.tenantId && tenantHeader && decoded.tenantId !== tenantHeader) {
-      return ResponseUtil.forbidden(res, 'Tenant mismatch');
-    }
 
     next();
   } catch (error) {

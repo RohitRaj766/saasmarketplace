@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { Home, ShoppingBag, CreditCard, BarChart3, Users } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const navItems = [
   {
@@ -9,34 +10,46 @@ const navItems = [
     path: '/app/overview',
     icon: Home,
     feature: null,
+    roles: ['admin', 'support'], // Available to all roles
   },
   {
     name: 'Orders',
     path: '/app/orders',
     icon: ShoppingBag,
     feature: 'orders',
+    roles: ['admin', 'support'],
   },
   {
     name: 'Billing',
     path: '/app/billing',
     icon: CreditCard,
     feature: 'billing',
+    roles: ['admin', 'support'],
   },
   {
     name: 'Analytics',
     path: '/app/analytics',
     icon: BarChart3,
     feature: 'analytics',
+    roles: ['admin'], // Only admin can access
   },
   {
     name: 'Team',
     path: '/app/team',
     icon: Users,
     feature: 'admin',
+    roles: ['admin'], // Only admin can access
   },
 ];
 
 export function Sidebar() {
+  const { user } = useAuth();
+
+  // Filter navigation items based on user role
+  const visibleNavItems = navItems.filter((item) => {
+    if (!user) return false;
+    return item.roles.includes(user.role);
+  });
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
@@ -45,7 +58,7 @@ export function Sidebar() {
       className="w-64 bg-card/50 backdrop-blur-sm border-r border-border flex-shrink-0 overflow-hidden"
     >
       <nav className="p-3 space-y-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
 
           return (

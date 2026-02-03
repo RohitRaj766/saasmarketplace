@@ -88,21 +88,34 @@ export default function Signup() {
       return;
     }
     
-    // Simulate payment processing
     setIsProcessing(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // In a real app, you would process payment first with Stripe/PayPal
+      // For now, we'll create the organization and admin user
       
-      // In a real app, you would:
-      // 1. Create tenant in database
-      // 2. Process payment with Stripe/PayPal
-      // 3. Create admin user
-      // 4. Send welcome email
-      // 5. Redirect to dashboard
-      
-      // For demo, just navigate to login
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          organizationName: companyName,
+          plan: selectedPlan,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create account');
+      }
+
+      // Navigate to login with success message
       navigate('/login', {
         state: {
           message: 'Account created successfully! Please sign in.',

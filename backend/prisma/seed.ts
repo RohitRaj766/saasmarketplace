@@ -6,6 +6,21 @@ const prisma = new PrismaClient();
 async function seed() {
   console.log('🌱 Seeding database...');
 
+  // Create demo organization
+  const organization = await prisma.organization.upsert({
+    where: { slug: 'demo-org' },
+    update: {},
+    create: {
+      name: 'Demo Organization',
+      slug: 'demo-org',
+      plan: 'professional',
+      maxUsers: 50,
+      isActive: true,
+    },
+  });
+
+  console.log('✅ Created organization:', organization.name);
+
   // Create demo user
   const passwordHash = await bcrypt.hash('password123', 10);
 
@@ -13,38 +28,52 @@ async function seed() {
     where: { email: 'admin@example.com' },
     update: {},
     create: {
+      organizationId: organization.id,
       email: 'admin@example.com',
       passwordHash,
       firstName: 'Admin',
       lastName: 'User',
       role: 'admin',
+      isOwner: true,
     },
   });
 
   console.log('✅ Created user:', user.email);
 
+  // Delete ALL existing demo data (from all organizations)
+  await prisma.invoice.deleteMany({});
+  await prisma.order.deleteMany({});
+
+  console.log('🗑️  Cleaned up all existing data');
+
   // Create demo orders
   const order1 = await prisma.order.create({
     data: {
+      organizationId: organization.id,
       userId: user.id,
       orderNumber: 'ORD-001',
       status: 'completed',
       totalAmount: 1250.00,
-      items: [
-        { name: 'Product A', quantity: 2, price: 625 },
-      ],
+      items: {
+        items: [
+          { name: 'Product A', quantity: 2, price: 625 },
+        ],
+      },
     },
   });
 
   const order2 = await prisma.order.create({
     data: {
+      organizationId: organization.id,
       userId: user.id,
       orderNumber: 'ORD-002',
       status: 'pending',
       totalAmount: 850.00,
-      items: [
-        { name: 'Product B', quantity: 1, price: 850 },
-      ],
+      items: {
+        items: [
+          { name: 'Product B', quantity: 1, price: 850 },
+        ],
+      },
     },
   });
 
@@ -53,6 +82,7 @@ async function seed() {
   // Create demo invoices
   const invoice1 = await prisma.invoice.create({
     data: {
+      organizationId: organization.id,
       userId: user.id,
       orderId: order1.id,
       invoiceNumber: 'INV-001',
@@ -65,6 +95,7 @@ async function seed() {
 
   const invoice2 = await prisma.invoice.create({
     data: {
+      organizationId: organization.id,
       userId: user.id,
       orderId: order2.id,
       invoiceNumber: 'INV-002',

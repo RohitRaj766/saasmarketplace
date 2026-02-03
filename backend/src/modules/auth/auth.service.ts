@@ -10,6 +10,8 @@ export class AuthService {
     password: string;
     firstName?: string;
     lastName?: string;
+    organizationName: string;
+    plan?: string;
   }) {
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
@@ -21,35 +23,91 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(data.password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
-        passwordHash,
-        firstName: data.firstName,
-        lastName: data.lastName,
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-      },
+    // Create organization slug from name
+    const slug = data.organizationName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    // Check if slug already exists
+    const existingOrg = await prisma.organization.findUnique({
+      where: { slug },
     });
 
-    const tokens = await this.generateTokens(user);
+    if (existingOrg) {
+      throw new AppError('Organization name already taken. Please choose a different name.', 400);
+    }
 
-    return { user, ...tokens };
+    // Determine plan limits
+    const planLimits: Record<string, number> = {
+      free: 5,
+      starter: 10,
+      professional: 50,
+      enterprise: 999,
+    };
+
+    const plan = data.plan || 'free';
+    const maxUsers = planLimits[plan] || 5;
+
+    // Create organization and owner user in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create organization
+      const organization = await tx.organization.create({
+        data: {
+          name: data.organizationName,
+          slug,
+          plan,
+          maxUsers,
+          planStartDate: new Date(),
+        },
+      });
+
+      // Create owner user
+      const user = await tx.user.create({
+        data: {
+          organizationId: organization.id,
+          email: data.email,
+          passwordHash,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: 'admin',
+          isOwner: true,
+        },
+        select: {
+          id: true,
+          organizationId: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isOwner: true,
+          createdAt: true,
+        },
+      });
+
+      return { user, organization };
+    });
+
+    const tokens = await this.generateTokens(result.user);
+
+    return { user: result.user, organization: result.organization, ...tokens };
   }
 
   async login(email: string, password: string) {
     const user = await prisma.user.findUnique({
       where: { email },
+      include: {
+        organization: true,
+      },
     });
 
     if (!user) {
       throw new AppError('Invalid credentials', 401);
+    }
+
+    // Check if organization is active
+    if (!user.organization.isActive) {
+      throw new AppError('Your organization account is inactive. Please contact support.', 403);
     }
 
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
@@ -63,12 +121,21 @@ export class AuthService {
     return {
       user: {
         id: user.id,
+        organizationId: user.organizationId,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        isOwner: user.isOwner,
         department: user.department,
         jobTitle: user.jobTitle,
+      },
+      organization: {
+        id: user.organization.id,
+        name: user.organization.name,
+        slug: user.organization.slug,
+        plan: user.organization.plan,
+        maxUsers: user.organization.maxUsers,
       },
       ...tokens,
     };
@@ -112,8 +179,10 @@ export class AuthService {
     return jwt.sign(
       {
         userId: user.id,
+        organizationId: user.organizationId,
         email: user.email,
         role: user.role,
+        isOwner: user.isOwner || false,
       },
       config.jwt.secret,
       { expiresIn: config.jwt.expiresIn } as jwt.SignOptions

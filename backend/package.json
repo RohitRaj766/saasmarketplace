@@ -11,7 +11,8 @@
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
     "seed:production": "tsx prisma/seed-production.ts",
-    "seed:tenants": "tsx prisma/seed-tenants.ts"
+    "seed:tenants": "tsx prisma/seed-tenants.ts",
+    "create-admin": "tsx src/scripts/create-admin.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
