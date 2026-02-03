@@ -1,4 +1,4 @@
-import { DollarSign, ShoppingCart, TrendingUp, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { DollarSign, ShoppingCart, TrendingUp, Clock, CheckCircle, AlertCircle, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface DashboardProps {
   metrics: {
@@ -6,6 +6,8 @@ interface DashboardProps {
     totalOrders: number;
     avgOrderValue: number;
     pendingInvoices: number;
+    paidInvoices: number;
+    overdueInvoices: number;
   };
 }
 
@@ -13,7 +15,7 @@ export default function Dashboard({ metrics }: DashboardProps) {
   const metricCards = [
     {
       title: 'Total Revenue',
-      value: `$${Number(metrics.totalRevenue).toLocaleString()}`,
+      value: `$${Number(metrics.totalRevenue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: '+12.5%',
       trend: 'up' as const,
       icon: DollarSign,
@@ -31,7 +33,7 @@ export default function Dashboard({ metrics }: DashboardProps) {
     },
     {
       title: 'Avg Order Value',
-      value: `$${Number(metrics.avgOrderValue).toLocaleString()}`,
+      value: `$${Number(metrics.avgOrderValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: '+2.1%',
       trend: 'up' as const,
       icon: TrendingUp,
@@ -39,18 +41,36 @@ export default function Dashboard({ metrics }: DashboardProps) {
       iconColor: 'text-purple-600 dark:text-purple-400',
     },
     {
+      title: 'Paid Invoices',
+      value: metrics.paidInvoices.toString(),
+      change: '+15.8%',
+      trend: 'up' as const,
+      icon: CheckCircle,
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+    },
+    {
       title: 'Pending Invoices',
       value: metrics.pendingInvoices.toString(),
       change: '-5.2%',
       trend: 'down' as const,
       icon: Clock,
-      iconBg: 'bg-orange-500/10',
-      iconColor: 'text-orange-600 dark:text-orange-400',
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+    },
+    {
+      title: 'Overdue Invoices',
+      value: metrics.overdueInvoices.toString(),
+      change: '-8.4%',
+      trend: 'down' as const,
+      icon: AlertCircle,
+      iconBg: 'bg-red-500/10',
+      iconColor: 'text-red-600 dark:text-red-400',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {metricCards.map((metric) => {
         const Icon = metric.icon;
         return (
