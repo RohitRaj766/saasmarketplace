@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 import { Layout } from './components/Layout/Layout';
 import Landing from './pages/Landing';
 import Signup from './pages/Signup';
@@ -45,8 +46,22 @@ function App() {
                 <Route path="/app/overview" element={<Dashboard />} />
                 <Route path="/app/orders/*" element={<OrdersPage />} />
                 <Route path="/app/billing/*" element={<BillingPage />} />
-                <Route path="/app/analytics/*" element={<AnalyticsPage />} />
-                <Route path="/app/team/*" element={<AdminPage />} />
+                <Route 
+                  path="/app/analytics/*" 
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <AnalyticsPage />
+                    </RoleProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/app/team/*" 
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <AdminPage />
+                    </RoleProtectedRoute>
+                  } 
+                />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

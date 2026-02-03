@@ -3,9 +3,11 @@ import { Request } from 'express';
 export interface AuthRequest extends Request {
   user?: {
     userId: string;
+    organizationId: string;
     email: string;
     role: string;
-    tenantId?: string; // Phase 2
+    isOwner: boolean;
+    tenantId?: string; // Legacy support
   };
 }
 

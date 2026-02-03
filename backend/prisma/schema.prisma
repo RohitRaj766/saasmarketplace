@@ -7,57 +7,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Organization {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  plan            String   @default("free") // free, starter, professional, enterprise
+  planStartDate   DateTime @default(now()) @map("plan_start_date")
+  planEndDate     DateTime? @map("plan_end_date")
+  maxUsers        Int      @default(5) @map("max_users")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  users           User[]
+  orders          Order[]
+  invoices        Invoice[]
+
+  @@map("organizations")
+}
+
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  passwordHash  String   @map("password_hash")
-  firstName     String?  @map("first_name")
-  lastName      String?  @map("last_name")
-  role          String   @default("user")
-  department    String?
-  jobTitle      String?  @map("job_title")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  email           String   @unique
+  passwordHash    String   @map("password_hash")
+  firstName       String?  @map("first_name")
+  lastName        String?  @map("last_name")
+  role            String   @default("support") // admin, support
+  isOwner         Boolean  @default(false) @map("is_owner")
+  department      String?
+  jobTitle        String?  @map("job_title")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  orders        Order[]
-  invoices      Invoice[]
-  refreshTokens RefreshToken[]
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  orders          Order[]
+  invoices        Invoice[]
+  refreshTokens   RefreshToken[]
 
+  @@index([organizationId])
   @@map("users")
 }
 
 model Order {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  orderNumber String   @unique @map("order_number")
-  status      String   @default("pending")
-  totalAmount Decimal  @map("total_amount") @db.Decimal(10, 2)
-  items       Json
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  userId          String   @map("user_id")
+  orderNumber     String   @unique @map("order_number")
+  status          String   @default("pending")
+  totalAmount     Decimal  @map("total_amount") @db.Decimal(10, 2)
+  items           Json
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invoices    Invoice[]
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices        Invoice[]
 
+  @@index([organizationId])
   @@index([userId])
   @@map("orders")
 }
 
 model Invoice {
-  id            String    @id @default(uuid())
-  userId        String    @map("user_id")
-  orderId       String?   @map("order_id")
-  invoiceNumber String    @unique @map("invoice_number")
-  amount        Decimal   @db.Decimal(10, 2)
-  status        String    @default("unpaid")
-  dueDate       DateTime  @map("due_date")
-  paidAt        DateTime? @map("paid_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id              String    @id @default(uuid())
+  organizationId  String    @map("organization_id")
+  userId          String    @map("user_id")
+  orderId         String?   @map("order_id")
+  invoiceNumber   String    @unique @map("invoice_number")
+  amount          Decimal   @db.Decimal(10, 2)
+  status          String    @default("unpaid")
+  dueDate         DateTime  @map("due_date")
+  paidAt          DateTime? @map("paid_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order         Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
+  @@index([organizationId])
   @@index([userId])
   @@map("invoices")
 }

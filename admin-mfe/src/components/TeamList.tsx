@@ -26,7 +26,7 @@ export default function TeamList({ members, currentUser, onUpdateRole, onDeactiv
     switch (role) {
       case 'admin': 
         return 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400';
-      case 'manager': 
+      case 'support': 
         return 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400';
       default: 
         return 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400';
@@ -36,7 +36,7 @@ export default function TeamList({ members, currentUser, onUpdateRole, onDeactiv
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'admin': return <Shield className="h-3 w-3" />;
-      case 'manager': return <Briefcase className="h-3 w-3" />;
+      case 'support': return <UserIcon className="h-3 w-3" />;
       default: return <UserIcon className="h-3 w-3" />;
     }
   };
@@ -87,8 +87,7 @@ export default function TeamList({ members, currentUser, onUpdateRole, onDeactiv
                   onBlur={() => setEditingRole(null)}
                   autoFocus
                 >
-                  <option value="user">User</option>
-                  <option value="manager">Manager</option>
+                  <option value="support">Support</option>
                   <option value="admin">Admin</option>
                 </select>
               ) : (
@@ -150,7 +149,7 @@ export default function TeamList({ members, currentUser, onUpdateRole, onDeactiv
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors font-medium text-sm"
               >
                 <UserX className="h-4 w-4" />
-                Deactivate User
+                Delete User
               </button>
             </div>
           )}
