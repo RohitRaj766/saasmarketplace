@@ -8,7 +8,8 @@ const ordersService = new OrdersService();
 export class OrdersController {
   async getOrders(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const orders = await ordersService.getOrders(req.user!.userId);
+      const status = req.query.status as string | undefined;
+      const orders = await ordersService.getOrders(req.user!.userId, status);
       return ResponseUtil.success(res, orders);
     } catch (error) {
       next(error);

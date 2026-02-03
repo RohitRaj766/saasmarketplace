@@ -18,9 +18,12 @@ export class OrdersService {
     return order;
   }
 
-  async getOrders(userId: string) {
+  async getOrders(userId: string, status?: string) {
     const orders = await prisma.order.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        ...(status && { status })
+      },
       orderBy: { createdAt: 'desc' },
     });
     return orders.map(order => this.formatOrderResponse(order));

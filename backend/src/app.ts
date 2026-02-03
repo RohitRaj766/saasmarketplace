@@ -49,6 +49,7 @@ app.get('/billing/invoices', authenticate, billingController.getInvoices);
 app.get('/billing/invoices/:id', authenticate, billingController.getInvoiceById);
 app.post('/billing/invoices', authenticate, billingController.createInvoice);
 app.post('/billing/invoices/:id/pay', authenticate, billingController.payInvoice);
+app.patch('/billing/invoices/:id/status', authenticate, billingController.updateInvoiceStatus);
 
 // Error handling
 app.use(notFoundHandler);

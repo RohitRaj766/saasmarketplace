@@ -1,0 +1,37 @@
+@media print {
+  /* Hide everything except the invoice content */
+  body * {
+    visibility: hidden;
+  }
+  
+  .invoice-print-content,
+  .invoice-print-content * {
+    visibility: visible;
+  }
+  
+  .invoice-print-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  /* Hide print button and other UI elements */
+  .print-hide {
+    display: none !important;
+  }
+  
+  /* Optimize for print */
+  @page {
+    margin: 1cm;
+  }
+  
+  /* Ensure proper page breaks */
+  table {
+    page-break-inside: avoid;
+  }
+  
+  tr {
+    page-break-inside: avoid;
+  }
+}
