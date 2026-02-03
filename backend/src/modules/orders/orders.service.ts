@@ -2,22 +2,18 @@ import prisma from '../../config/database';
 import { AppError } from '../../common/middleware/error.middleware';
 
 export class OrdersService {
-  async getOrders(userId: string, tenantId?: string) {
+  async getOrders(userId: string) {
     return prisma.order.findMany({
-      where: {
-        userId,
-        ...(tenantId && { tenantId }), // Phase 2
-      },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async getOrderById(id: string, userId: string, tenantId?: string) {
+  async getOrderById(id: string, userId: string) {
     const order = await prisma.order.findFirst({
       where: {
         id,
         userId,
-        ...(tenantId && { tenantId }), // Phase 2
       },
     });
 
@@ -37,7 +33,6 @@ export class OrdersService {
     customerPhone?: string;
     shippingAddress?: any;
     notes?: string;
-    tenantId?: string;
   }) {
     const orderNumber = `ORD-${Date.now()}`;
 
@@ -55,7 +50,6 @@ export class OrdersService {
         },
         totalAmount: data.totalAmount,
         status: 'pending',
-        ...(data.tenantId && { tenantId: data.tenantId }),
       },
     });
   }
@@ -63,10 +57,9 @@ export class OrdersService {
   async updateOrderStatus(
     id: string,
     status: string,
-    userId: string,
-    tenantId?: string
+    userId: string
   ) {
-    const order = await this.getOrderById(id, userId, tenantId);
+    const order = await this.getOrderById(id, userId);
 
     return prisma.order.update({
       where: { id: order.id },
@@ -74,8 +67,8 @@ export class OrdersService {
     });
   }
 
-  async deleteOrder(id: string, userId: string, tenantId?: string) {
-    const order = await this.getOrderById(id, userId, tenantId);
+  async deleteOrder(id: string, userId: string) {
+    const order = await this.getOrderById(id, userId);
 
     await prisma.order.delete({
       where: { id: order.id },

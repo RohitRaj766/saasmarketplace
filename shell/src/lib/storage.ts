@@ -2,9 +2,6 @@ const KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
   USER: 'user',
-  TENANT_ID: 'tenant_id',
-  TENANT: 'tenant',
-  FEATURES: 'features',
 };
 
 class Storage {
@@ -33,39 +30,10 @@ class Storage {
     return user ? JSON.parse(user) : null;
   }
 
-  setTenantId(tenantId: string): void {
-    localStorage.setItem(KEYS.TENANT_ID, tenantId);
-  }
-
-  getTenantId(): string | null {
-    return localStorage.getItem(KEYS.TENANT_ID);
-  }
-
-  setTenant(tenant: any): void {
-    localStorage.setItem(KEYS.TENANT, JSON.stringify(tenant));
-  }
-
-  getTenant(): any | null {
-    const tenant = localStorage.getItem(KEYS.TENANT);
-    return tenant ? JSON.parse(tenant) : null;
-  }
-
-  setFeatures(features: string[]): void {
-    localStorage.setItem(KEYS.FEATURES, JSON.stringify(features));
-  }
-
-  getFeatures(): string[] {
-    const features = localStorage.getItem(KEYS.FEATURES);
-    return features ? JSON.parse(features) : [];
-  }
-
   clearAuth(): void {
     localStorage.removeItem(KEYS.ACCESS_TOKEN);
     localStorage.removeItem(KEYS.REFRESH_TOKEN);
     localStorage.removeItem(KEYS.USER);
-    localStorage.removeItem(KEYS.TENANT_ID);
-    localStorage.removeItem(KEYS.TENANT);
-    localStorage.removeItem(KEYS.FEATURES);
   }
 }
 

@@ -46,15 +46,6 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await prisma.user.findUnique({
       where: { email },
-      include: {
-        tenant: {
-          include: {
-            tenantFeatures: {
-              where: { isEnabled: true }
-            }
-          }
-        }
-      }
     });
 
     if (!user) {
@@ -69,9 +60,6 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user);
 
-    // Extract enabled features
-    const features = user.tenant?.tenantFeatures.map(f => f.featureKey) || [];
-
     return {
       user: {
         id: user.id,
@@ -79,19 +67,9 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        tenantId: user.tenantId,
         department: user.department,
         jobTitle: user.jobTitle,
       },
-      features,
-      tenant: user.tenant ? {
-        id: user.tenant.id,
-        name: user.tenant.name,
-        slug: user.tenant.slug,
-        subscriptionTier: user.tenant.subscriptionTier,
-        subscriptionStatus: user.tenant.subscriptionStatus,
-        theme: user.tenant.theme,
-      } : null,
       ...tokens,
     };
   }
@@ -136,7 +114,6 @@ export class AuthService {
         userId: user.id,
         email: user.email,
         role: user.role,
-        tenantId: user.tenantId,
       },
       config.jwt.secret,
       { expiresIn: config.jwt.expiresIn } as jwt.SignOptions

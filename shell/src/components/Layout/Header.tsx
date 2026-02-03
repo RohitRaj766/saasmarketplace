@@ -1,11 +1,10 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import { motion } from 'framer-motion';
 
 export function Header() {
-  const { user, tenant, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -16,19 +15,16 @@ export function Header() {
     >
       <div className="px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Tenant info */}
+          {/* Left side - App name */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3">
-              {/* Tenant name */}
               <div>
                 <h1 className="text-lg font-semibold text-foreground">
-                  {tenant?.name || 'OptiFlow'}
+                  OptiFlow
                 </h1>
-                {tenant && (
-                  <Badge variant="info" className="text-xs mt-0.5">
-                    {tenant.subscriptionTier.charAt(0).toUpperCase() + tenant.subscriptionTier.slice(1)} Plan
-                  </Badge>
-                )}
+                {/* <p className="text-xs text-muted-foreground">
+                  Microfrontend Platform
+                </p> */}
               </div>
             </div>
           </div>

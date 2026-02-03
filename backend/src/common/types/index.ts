@@ -5,7 +5,6 @@ export interface AuthRequest extends Request {
     userId: string;
     email: string;
     role: string;
-    tenantId?: string; // Phase 2
   };
 }
 

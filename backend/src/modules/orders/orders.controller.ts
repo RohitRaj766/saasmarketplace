@@ -8,10 +8,7 @@ const ordersService = new OrdersService();
 export class OrdersController {
   async getOrders(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const orders = await ordersService.getOrders(
-        req.user!.userId,
-        req.user!.tenantId
-      );
+      const orders = await ordersService.getOrders(req.user!.userId);
       return ResponseUtil.success(res, orders);
     } catch (error) {
       next(error);
@@ -22,8 +19,7 @@ export class OrdersController {
     try {
       const order = await ordersService.getOrderById(
         req.params.id,
-        req.user!.userId,
-        req.user!.tenantId
+        req.user!.userId
       );
       return ResponseUtil.success(res, order);
     } catch (error) {
@@ -35,7 +31,6 @@ export class OrdersController {
     try {
       const order = await ordersService.createOrder({
         userId: req.user!.userId,
-        tenantId: req.user!.tenantId,
         ...req.body,
       });
       return ResponseUtil.created(res, order, 'Order created successfully');
@@ -49,8 +44,7 @@ export class OrdersController {
       const order = await ordersService.updateOrderStatus(
         req.params.id,
         req.body.status,
-        req.user!.userId,
-        req.user!.tenantId
+        req.user!.userId
       );
       return ResponseUtil.success(res, order, 'Order updated successfully');
     } catch (error) {
@@ -62,8 +56,7 @@ export class OrdersController {
     try {
       await ordersService.deleteOrder(
         req.params.id,
-        req.user!.userId,
-        req.user!.tenantId
+        req.user!.userId
       );
       return ResponseUtil.noContent(res);
     } catch (error) {
