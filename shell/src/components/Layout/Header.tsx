@@ -12,27 +12,20 @@ export function Header() {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm"
+      className="sticky top-0 z-50 bg-transparent backdrop-blur-md border-b border-border/50"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-6">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Tenant info */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
-              {/* Logo/Icon */}
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">
-                  {tenant?.name?.charAt(0) || 'O'}
-                </span>
-              </div>
-              
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
               {/* Tenant name */}
               <div>
-                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h1 className="text-lg font-semibold text-foreground">
                   {tenant?.name || 'OptiFlow'}
                 </h1>
                 {tenant && (
-                  <Badge variant="info" className="text-xs">
+                  <Badge variant="info" className="text-xs mt-0.5">
                     {tenant.subscriptionTier.charAt(0).toUpperCase() + tenant.subscriptionTier.slice(1)} Plan
                   </Badge>
                 )}
@@ -41,12 +34,13 @@ export function Header() {
           </div>
 
           {/* Right side - User actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3">
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+              className="p-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200 border border-border"
               aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? (
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,19 +54,19 @@ export function Header() {
             </button>
 
             {/* User info */}
-            <div className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-medium text-sm shadow-md">
-                {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-              </div>
-              <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border bg-accent/50">
+              <div className="text-right">
+                <p className="text-sm font-semibold text-foreground">
                   {user?.firstName} {user?.lastName}
                 </p>
                 {user?.role && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                  <p className="text-xs text-muted-foreground capitalize">
                     {user.role}
                   </p>
                 )}
+              </div>
+              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm shadow-sm">
+                {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
               </div>
             </div>
 
@@ -81,9 +75,9 @@ export function Header() {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="hidden sm:inline-flex"
+              className="gap-2"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               Logout
