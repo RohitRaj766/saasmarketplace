@@ -25,12 +25,6 @@ class ApiClient {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
-        // Phase 2: Add tenant header
-        const tenantId = storage.getTenantId();
-        if (tenantId) {
-          config.headers['X-Tenant-ID'] = tenantId;
-        }
-
         return config;
       },
       (error) => Promise.reject(error)

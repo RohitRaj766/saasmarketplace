@@ -7,8 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Phase 1: Single Tenant Models
-
 model User {
   id            String   @id @default(uuid())
   email         String   @unique
@@ -21,17 +19,10 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  // Phase 2: Multi-Tenant
-  tenantId      String?  @map("tenant_id")
-  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
-
   orders        Order[]
   invoices      Invoice[]
   refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
-  usageMetrics  UsageMetric[]
 
-  @@index([tenantId])
   @@map("users")
 }
 
@@ -45,15 +36,10 @@ model Order {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Phase 2: Multi-Tenant
-  tenantId    String?  @map("tenant_id")
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
-
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   invoices    Invoice[]
 
   @@index([userId])
-  @@index([tenantId])
   @@map("orders")
 }
 
@@ -69,15 +55,10 @@ model Invoice {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  // Phase 2: Multi-Tenant
-  tenantId      String?   @map("tenant_id")
-  tenant        Tenant?   @relation(fields: [tenantId], references: [id])
-
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   order         Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([userId])
-  @@index([tenantId])
   @@map("invoices")
 }
 
@@ -92,115 +73,4 @@ model RefreshToken {
 
   @@index([userId])
   @@map("refresh_tokens")
-}
-
-// Phase 2: Multi-Tenant Models
-
-model Tenant {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  domain    String?
-  
-  // Subscription
-  subscriptionTier   String   @default("starter") @map("subscription_tier")
-  subscriptionStatus String   @default("trial") @map("subscription_status")
-  trialEndsAt        DateTime? @map("trial_ends_at")
-  subscriptionStartsAt DateTime? @map("subscription_starts_at")
-  subscriptionEndsAt   DateTime? @map("subscription_ends_at")
-  
-  // Settings
-  settings  Json     @default("{}")
-  theme     Json     @default("{}")
-  
-  // Status
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  
-  // Billing
-  billingEmail   String? @map("billing_email")
-  billingAddress Json?   @map("billing_address")
-  
-  // Metadata
-  industry    String?
-  companySize String? @map("company_size")
-  timezone    String  @default("UTC")
-  currency    String  @default("USD")
-
-  users          User[]
-  orders         Order[]
-  invoices       Invoice[]
-  tenantFeatures TenantFeature[]
-  auditLogs      AuditLog[]
-  usageMetrics   UsageMetric[]
-
-  @@map("tenants")
-}
-
-model TenantFeature {
-  id            String   @id @default(uuid())
-  tenantId      String   @map("tenant_id")
-  featureKey    String   @map("feature_key")
-  isEnabled     Boolean  @default(true) @map("is_enabled")
-  subscribedAt  DateTime @default(now()) @map("subscribed_at")
-  expiresAt     DateTime? @map("expires_at")
-  usageLimit    Int?     @map("usage_limit")
-  usageCurrent  Int      @default(0) @map("usage_current")
-  monthlyPrice  Decimal  @map("monthly_price") @db.Decimal(10, 2)
-  config        Json     @default("{}")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, featureKey])
-  @@index([tenantId])
-  @@index([tenantId, isEnabled])
-  @@map("tenant_features")
-}
-
-model AuditLog {
-  id          String   @id @default(uuid())
-  tenantId    String   @map("tenant_id")
-  userId      String?  @map("user_id")
-  action      String
-  entityType  String   @map("entity_type")
-  entityId    String?  @map("entity_id")
-  oldValues   Json?    @map("old_values")
-  newValues   Json?    @map("new_values")
-  ipAddress   String?  @map("ip_address")
-  userAgent   String?  @map("user_agent")
-  metadata    Json     @default("{}")
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([tenantId])
-  @@index([userId])
-  @@index([entityType, entityId])
-  @@index([tenantId, createdAt])
-  @@map("audit_logs")
-}
-
-model UsageMetric {
-  id          String   @id @default(uuid())
-  tenantId    String   @map("tenant_id")
-  metricType  String   @map("metric_type")
-  metricValue Decimal  @map("metric_value") @db.Decimal(12, 2)
-  featureKey  String?  @map("feature_key")
-  userId      String?  @map("user_id")
-  recordedAt  DateTime @default(now()) @map("recorded_at")
-  periodStart DateTime? @map("period_start")
-  periodEnd   DateTime? @map("period_end")
-  metadata    Json     @default("{}")
-
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([tenantId])
-  @@index([tenantId, metricType])
-  @@index([tenantId, recordedAt])
-  @@map("usage_metrics")
 }
