@@ -20,7 +20,7 @@ export default function Login() {
 
     try {
       await login({ email, password });
-      navigate('/app/dashboard');
+      navigate('/app/overview');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -126,22 +126,6 @@ export default function Login() {
               Sign in
             </Button>
           </form>
-
-          {/* Demo credentials */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mt-8 p-4 rounded-lg bg-primary/5 border border-primary/20"
-          >
-            <p className="text-sm font-semibold text-foreground mb-2">
-              Demo Credentials
-            </p>
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p><strong className="text-foreground">Atlassian:</strong> admin@atlassian.com / password123</p>
-              <p><strong className="text-foreground">Zoho:</strong> admin@zoho.com / password123</p>
-            </div>
-          </motion.div>
         </motion.div>
       </div>
 
@@ -149,10 +133,7 @@ export default function Login() {
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-[length:40px_40px]" />
         </div>
 
         <div className="relative flex flex-col justify-center px-12 text-primary-foreground z-10">
@@ -171,7 +152,7 @@ export default function Login() {
             {/* Feature List */}
             <ul className="space-y-4">
               {[
-                'Multi-tenant architecture',
+                'Built and Designed for fast teams',
                 'Real-time analytics dashboard',
                 'Enterprise-grade security',
                 'Seamless integrations',

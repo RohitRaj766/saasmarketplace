@@ -7,31 +7,31 @@ import { Home, ShoppingBag, CreditCard, BarChart3, Users } from 'lucide-react';
 const navItems = [
   {
     name: 'Overview',
-    path: '/dashboard',
+    path: '/app/overview',
     icon: Home,
     feature: null,
   },
   {
     name: 'Orders',
-    path: '/orders',
+    path: '/app/orders',
     icon: ShoppingBag,
     feature: 'orders',
   },
   {
     name: 'Billing',
-    path: '/billing',
+    path: '/app/billing',
     icon: CreditCard,
     feature: 'billing',
   },
   {
     name: 'Analytics',
-    path: '/analytics',
+    path: '/app/analytics',
     icon: BarChart3,
     feature: 'analytics',
   },
   {
     name: 'Team',
-    path: '/admin',
+    path: '/app/team',
     icon: Users,
     feature: 'admin',
   },
@@ -74,7 +74,7 @@ export function Sidebar() {
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-foreground rounded-r-full"
+                      className="  w-1 h-8 bg-primary-foreground rounded-r-full"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}

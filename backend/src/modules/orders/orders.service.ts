@@ -32,7 +32,12 @@ export class OrdersService {
     userId: string;
     items: any[];
     totalAmount: number;
-    tenantId?: string; // Phase 2
+    customerName?: string;
+    customerEmail?: string;
+    customerPhone?: string;
+    shippingAddress?: any;
+    notes?: string;
+    tenantId?: string;
   }) {
     const orderNumber = `ORD-${Date.now()}`;
 
@@ -40,10 +45,17 @@ export class OrdersService {
       data: {
         userId: data.userId,
         orderNumber,
-        items: data.items,
+        items: {
+          items: data.items,
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+          shippingAddress: data.shippingAddress,
+          notes: data.notes,
+        },
         totalAmount: data.totalAmount,
         status: 'pending',
-        ...(data.tenantId && { tenantId: data.tenantId }), // Phase 2
+        ...(data.tenantId && { tenantId: data.tenantId }),
       },
     });
   }

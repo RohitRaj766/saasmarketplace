@@ -156,7 +156,7 @@ start "Shell App (Port 3000)" cmd /k "npm run dev"
 
 echo.
 echo ╔════════════════════════════════════════════════════════╗
-echo ║   ✅ OptiFlow is starting up!                         ║
+echo             ✅ OptiFlow is starting up!                         
 echo ╚════════════════════════════════════════════════════════╝
 echo.
 echo 📊 Services:
@@ -168,8 +168,8 @@ echo   • Analytics MFE: http://localhost:3003
 echo   • Admin MFE:     http://localhost:3004
 echo.
 echo 🔐 Test Accounts:
-echo   Atlassian: admin@atlassian.com / password123
-echo   Zoho:      admin@zoho.com / password123
+echo   Atlassian: scott.farquhar@atlassian.com / password123
+echo   Zoho:      raju.vegesna@zoho.com / password123
 echo.
 echo ⏳ Wait 10-15 seconds for all services to start...
 echo 🌐 Then open: http://localhost:3000

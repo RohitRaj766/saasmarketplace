@@ -11,7 +11,7 @@ interface SignupState {
 
 const steps = [
   { id: 1, name: 'Company Info', icon: Building2 },
-  { id: 2, name: 'Admin Account', icon: User },
+  { id: 2, name: 'Admin', icon: User },
   { id: 3, name: 'Payment', icon: CreditCard },
 ];
 
@@ -456,10 +456,7 @@ export default function Signup() {
       {/* Right side - Benefits */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-[length:40px_40px]" />
         </div>
 
         <div className="relative flex flex-col justify-center px-12 text-primary-foreground z-10">

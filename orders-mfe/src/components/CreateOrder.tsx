@@ -1,191 +1,423 @@
-import { useState, FormEvent } from 'react';
-import { OrderItem } from '../types/order.types';
-import { formatCurrency } from '../lib/utils';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { OrderItem, ShippingAddress } from '../types/order.types';
+import { Plus, Trash2, Package } from 'lucide-react';
 
 interface CreateOrderProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (orderData: any) => Promise<void>;
   onCancel: () => void;
 }
 
 export function CreateOrder({ onSubmit, onCancel }: CreateOrderProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [notes, setNotes] = useState('');
+  
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'USA',
+  });
+
   const [items, setItems] = useState<OrderItem[]>([
-    { name: '', quantity: 1, price: 0 }
+    {
+      productName: '',
+      sku: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      tax: 0,
+      total: 0,
+    },
   ]);
 
-  const addItem = () => {
-    setItems([...items, { name: '', quantity: 1, price: 0 }]);
-  };
-
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
+  const calculateItemTotal = (item: OrderItem) => {
+    const subtotal = item.quantity * item.unitPrice;
+    const discountAmount = (subtotal * (item.discount || 0)) / 100;
+    const taxableAmount = subtotal - discountAmount;
+    const taxAmount = (taxableAmount * (item.tax || 0)) / 100;
+    return taxableAmount + taxAmount;
   };
 
   const updateItem = (index: number, field: keyof OrderItem, value: any) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
+    newItems[index].total = calculateItemTotal(newItems[index]);
     setItems(newItems);
   };
 
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  const addItem = () => {
+    setItems([
+      ...items,
+      {
+        productName: '',
+        sku: '',
+        quantity: 1,
+        unitPrice: 0,
+        discount: 0,
+        tax: 0,
+        total: 0,
+      },
+    ]);
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      items,
-      totalAmount: calculateTotal()
-    });
+  const removeItem = (index: number) => {
+    if (items.length > 1) {
+      setItems(items.filter((_, i) => i !== index));
+    }
   };
+
+  const calculateTotals = () => {
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const totalDiscount = items.reduce((sum, item) => {
+      const itemSubtotal = item.quantity * item.unitPrice;
+      return sum + (itemSubtotal * (item.discount || 0)) / 100;
+    }, 0);
+    const totalTax = items.reduce((sum, item) => {
+      const itemSubtotal = item.quantity * item.unitPrice;
+      const discountAmount = (itemSubtotal * (item.discount || 0)) / 100;
+      const taxableAmount = itemSubtotal - discountAmount;
+      return sum + (taxableAmount * (item.tax || 0)) / 100;
+    }, 0);
+    const total = items.reduce((sum, item) => sum + item.total, 0);
+
+    return { subtotal, totalDiscount, totalTax, total };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!customerName || !customerEmail || items.some(item => !item.productName || item.quantity <= 0)) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { total } = calculateTotals();
+      await onSubmit({
+        customerName,
+        customerEmail,
+        customerPhone,
+        shippingAddress,
+        notes,
+        items,
+        totalAmount: total,
+      });
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      alert('Failed to create order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const totals = calculateTotals();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm"
     >
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Create New Order
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Add items to create a new order
-        </p>
-      </div>
+      <form onSubmit={handleSubmit}>
+        {/* Customer Information */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Package className="h-5 w-5 text-blue-600" />
+            Customer Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Customer Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Phone
+              </label>
+              <input
+                type="tel"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+          </div>
+        </div>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        {/* Items Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+        {/* Shipping Address */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Shipping Address
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Street Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={shippingAddress.street}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={shippingAddress.city}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                State <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={shippingAddress.state}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                ZIP Code <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={shippingAddress.zipCode}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Country <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={shippingAddress.country}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Order Items */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Order Items
-            </h3>
+            </h2>
             <button
               type="button"
               onClick={addItem}
-              className="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors duration-150 text-sm font-medium"
+              className="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
             >
-              <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
+              <Plus className="h-4 w-4 mr-1" />
               Add Item
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {items.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3">
-                  {/* Item Name */}
-                  <div className="md:col-span-5">
+              <div key={index} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+                  <div className="md:col-span-2">
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Item Name
+                      Product Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter item name"
-                      value={item.name}
-                      onChange={(e) => updateItem(index, 'name', e.target.value)}
+                      value={item.productName}
+                      onChange={(e) => updateItem(index, 'productName', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       required
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-
-                  {/* Quantity */}
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Quantity
+                      SKU
+                    </label>
+                    <input
+                      type="text"
+                      value={item.sku}
+                      onChange={(e) => updateItem(index, 'sku', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
-                      placeholder="Qty"
                       min="1"
                       value={item.quantity}
                       onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       required
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-
-                  {/* Price */}
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Price
+                      Unit Price <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
-                      placeholder="0.00"
                       min="0"
                       step="0.01"
-                      value={item.price}
-                      onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
+                      value={item.unitPrice}
+                      onChange={(e) => updateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       required
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-
-                  {/* Subtotal */}
-                  <div className="md:col-span-3 flex items-end">
-                    <div className="w-full">
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Subtotal
-                      </label>
-                      <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-900 dark:text-white">
-                        {formatCurrency(item.quantity * item.price)}
-                      </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      disabled={items.length === 1}
+                      className="w-full px-3 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Trash2 className="h-4 w-4 mx-auto" />
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3 mt-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Discount (%)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={item.discount}
+                      onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Tax (%)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={item.tax}
+                      onChange={(e) => updateItem(index, 'tax', parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Total
+                    </label>
+                    <div className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white font-medium">
+                      ${item.total.toFixed(2)}
                     </div>
                   </div>
                 </div>
-
-                {/* Remove Button */}
-                {items.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    className="mt-6 p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-150"
-                    title="Remove item"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Total Section */}
-        <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <span className="text-lg font-semibold text-gray-900 dark:text-white">
-            Total Amount:
-          </span>
-          <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {formatCurrency(calculateTotal())}
-          </span>
+        {/* Order Summary */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Order Summary
+          </h2>
+          <div className="space-y-2 max-w-md ml-auto">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+              <span className="text-gray-900 dark:text-white font-medium">${totals.subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Discount:</span>
+              <span className="text-red-600 dark:text-red-400 font-medium">-${totals.totalDiscount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Tax:</span>
+              <span className="text-gray-900 dark:text-white font-medium">${totals.totalTax.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-300 dark:border-gray-600">
+              <span className="text-gray-900 dark:text-white">Total:</span>
+              <span className="text-blue-600 dark:text-blue-400">${totals.total.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Form Actions */}
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        {/* Notes */}
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Order Notes
+          </label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            placeholder="Add any special instructions or notes..."
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="p-6 flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            disabled={isSubmitting}
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+            disabled={isSubmitting}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Order
+            {isSubmitting ? 'Creating...' : 'Create Order'}
           </button>
         </div>
       </form>
