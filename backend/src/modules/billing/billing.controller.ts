@@ -56,4 +56,19 @@ export class BillingController {
       next(error);
     }
   }
+
+  async updateInvoiceStatus(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { status } = req.body;
+      const invoice = await billingService.updateInvoiceStatus(
+        req.params.id,
+        status,
+        req.user!.userId,
+        req.user!.tenantId
+      );
+      return ResponseUtil.success(res, invoice, 'Invoice status updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
