@@ -39,6 +39,19 @@ export class OrdersController {
     }
   }
 
+  async updateOrder(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const order = await ordersService.updateOrder(
+        req.params.id,
+        req.body,
+        req.user!.userId
+      );
+      return ResponseUtil.success(res, order, 'Order updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateOrderStatus(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const order = await ordersService.updateOrderStatus(

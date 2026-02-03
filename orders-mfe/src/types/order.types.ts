@@ -3,7 +3,7 @@ export interface Order {
   orderNumber: string;
   userId?: string;
   tenantId?: string;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'accepted' | 'dispatched' | 'completed' | 'cancelled';
   totalAmount: number;
   items: OrderItem[];
   customerName?: string;
