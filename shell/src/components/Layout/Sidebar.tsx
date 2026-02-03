@@ -7,31 +7,31 @@ import { Home, ShoppingBag, CreditCard, BarChart3, Users } from 'lucide-react';
 const navItems = [
   {
     name: 'Overview',
-    path: '/dashboard',
+    path: '/app/overview',
     icon: Home,
     feature: null,
   },
   {
     name: 'Orders',
-    path: '/orders',
+    path: '/app/orders',
     icon: ShoppingBag,
     feature: 'orders',
   },
   {
     name: 'Billing',
-    path: '/billing',
+    path: '/app/billing',
     icon: CreditCard,
     feature: 'billing',
   },
   {
     name: 'Analytics',
-    path: '/analytics',
+    path: '/app/analytics',
     icon: BarChart3,
     feature: 'analytics',
   },
   {
     name: 'Team',
-    path: '/admin',
+    path: '/app/team',
     icon: Users,
     feature: 'admin',
   },

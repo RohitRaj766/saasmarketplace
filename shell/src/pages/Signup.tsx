@@ -11,7 +11,7 @@ interface SignupState {
 
 const steps = [
   { id: 1, name: 'Company Info', icon: Building2 },
-  { id: 2, name: 'Admin Account', icon: User },
+  { id: 2, name: 'Admin', icon: User },
   { id: 3, name: 'Payment', icon: CreditCard },
 ];
 

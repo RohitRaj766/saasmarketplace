@@ -43,12 +43,12 @@ function App() {
                     </ProtectedRoute>
                   }
                 >
-                  <Route index element={<Navigate to="/app/dashboard" replace />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="orders/*" element={<OrdersPage />} />
-                  <Route path="billing/*" element={<BillingPage />} />
-                  <Route path="analytics/*" element={<AnalyticsPage />} />
-                  <Route path="admin/*" element={<AdminPage />} />
+                  <Route index element={<Navigate to="/app/overview" replace />} />
+                  <Route path="/app/overview" element={<Dashboard />} />
+                  <Route path="/app/orders/*" element={<OrdersPage />} />
+                  <Route path="/app/billing/*" element={<BillingPage />} />
+                  <Route path="/app/analytics/*" element={<AnalyticsPage />} />
+                  <Route path="/app/team/*" element={<AdminPage />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

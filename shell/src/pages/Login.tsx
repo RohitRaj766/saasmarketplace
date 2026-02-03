@@ -20,7 +20,7 @@ export default function Login() {
 
     try {
       await login({ email, password });
-      navigate('/app/dashboard');
+      navigate('/app/overview');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -126,22 +126,6 @@ export default function Login() {
               Sign in
             </Button>
           </form>
-
-          {/* Demo credentials */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mt-8 p-4 rounded-lg bg-primary/5 border border-primary/20"
-          >
-            <p className="text-sm font-semibold text-foreground mb-2">
-              Demo Credentials
-            </p>
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p><strong className="text-foreground">Atlassian:</strong> admin@atlassian.com / password123</p>
-              <p><strong className="text-foreground">Zoho:</strong> admin@zoho.com / password123</p>
-            </div>
-          </motion.div>
         </motion.div>
       </div>
 
