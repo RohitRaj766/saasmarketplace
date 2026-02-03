@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { OrderList } from './components/OrderList';
 import { OrderDetail } from './components/OrderDetail';
 import { CreateOrder } from './components/CreateOrder';
+import { EditOrder } from './components/EditOrder';
 import { Order } from './types/order.types';
 import { motion } from 'framer-motion';
 
@@ -11,7 +12,7 @@ interface OrdersAppProps {
 }
 
 export default function OrdersApp({ apiClient }: OrdersAppProps) {
-  const [view, setView] = useState<'list' | 'detail' | 'create'>('list');
+  const [view, setView] = useState<'list' | 'detail' | 'create' | 'edit'>('list');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +41,55 @@ export default function OrdersApp({ apiClient }: OrdersAppProps) {
     setView('detail');
   };
 
+  const handleEditOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setView('edit');
+  };
+
   const handleCreateOrder = async (orderData: any) => {
     try {
       await apiClient.post('/orders', orderData);
-      await loadOrders(); // Reload orders from server
+      await loadOrders();
       setView('list');
     } catch (error) {
       console.error('Failed to create order:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdateOrder = async (orderData: any) => {
+    if (!selectedOrder) return;
+    
+    try {
+      await apiClient.put(`/orders/${selectedOrder.id}`, orderData);
+      await loadOrders();
+      setView('list');
+      setSelectedOrder(null);
+    } catch (error) {
+      console.error('Failed to update order:', error);
+      throw error;
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
+    try {
+      await apiClient.patch(`/orders/${orderId}/status`, { status: newStatus });
+      
+      // Reload orders from server
+      const response = await apiClient.get('/orders');
+      const data = response.data || response;
+      const updatedOrders = Array.isArray(data) ? data : [];
+      setOrders(updatedOrders);
+      
+      // Update selected order if it's the one being changed
+      if (selectedOrder && selectedOrder.id === orderId) {
+        const updatedOrder = updatedOrders.find(o => o.id === orderId);
+        if (updatedOrder) {
+          setSelectedOrder(updatedOrder);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error);
       throw error;
     }
   };
@@ -73,6 +116,7 @@ export default function OrdersApp({ apiClient }: OrdersAppProps) {
               {view === 'list' && `${orders.length} total orders`}
               {view === 'detail' && 'Order details'}
               {view === 'create' && 'Create a new order'}
+              {view === 'edit' && 'Edit order'}
             </p>
           </div>
           
@@ -119,11 +163,23 @@ export default function OrdersApp({ apiClient }: OrdersAppProps) {
           )}
 
           {view === 'detail' && selectedOrder && (
-            <OrderDetail order={selectedOrder} />
+            <OrderDetail 
+              order={selectedOrder} 
+              onEdit={handleEditOrder}
+              onStatusChange={handleStatusChange}
+            />
           )}
 
           {view === 'create' && (
             <CreateOrder onSubmit={handleCreateOrder} onCancel={handleBack} />
+          )}
+
+          {view === 'edit' && selectedOrder && (
+            <EditOrder 
+              order={selectedOrder} 
+              onSubmit={handleUpdateOrder} 
+              onCancel={handleBack} 
+            />
           )}
         </motion.div>
       </div>

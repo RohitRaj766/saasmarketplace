@@ -40,6 +40,7 @@ app.get('/tenants/:slug', tenantsController.getTenantBySlug);
 app.get('/orders', authenticate, ordersController.getOrders);
 app.get('/orders/:id', authenticate, ordersController.getOrderById);
 app.post('/orders', authenticate, ordersController.createOrder);
+app.put('/orders/:id', authenticate, ordersController.updateOrder);
 app.patch('/orders/:id/status', authenticate, ordersController.updateOrderStatus);
 app.delete('/orders/:id', authenticate, authorize('admin'), ordersController.deleteOrder);
 
