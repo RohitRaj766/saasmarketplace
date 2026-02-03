@@ -130,8 +130,13 @@ export function OrderDetail({ order }: OrderDetailProps) {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {item.name}
+                          {item.productName}
                         </div>
+                        {item.sku && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            SKU: {item.sku}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -142,12 +147,12 @@ export function OrderDetail({ order }: OrderDetailProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {formatCurrency(Number(item.price))}
+                      {formatCurrency(Number(item.unitPrice))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {formatCurrency(item.quantity * Number(item.price))}
+                      {formatCurrency(item.total)}
                     </div>
                   </td>
                 </motion.tr>

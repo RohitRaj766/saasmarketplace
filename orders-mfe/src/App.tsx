@@ -25,41 +25,11 @@ export default function OrdersApp({ apiClient }: OrdersAppProps) {
     try {
       setIsLoading(true);
       const response = await apiClient.get('/orders');
-      // Handle wrapped response from backend
       const data = response.data || response;
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load orders:', error);
-      // Mock data for demo
-      setOrders([
-        {
-          id: '1',
-          orderNumber: 'ORD-001',
-          status: 'pending',
-          totalAmount: 1250.00,
-          items: [{ name: 'Product A', quantity: 2, price: 625 }],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          orderNumber: 'ORD-002',
-          status: 'completed',
-          totalAmount: 850.00,
-          items: [{ name: 'Product B', quantity: 1, price: 850 }],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: '3',
-          orderNumber: 'ORD-003',
-          status: 'processing',
-          totalAmount: 2100.00,
-          items: [{ name: 'Product C', quantity: 3, price: 700 }],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ]);
+      setOrders([]);
     } finally {
       setIsLoading(false);
     }
@@ -72,12 +42,12 @@ export default function OrdersApp({ apiClient }: OrdersAppProps) {
 
   const handleCreateOrder = async (orderData: any) => {
     try {
-      const response = await apiClient.post('/orders', orderData);
-      const newOrder = response.data || response;
-      setOrders([newOrder, ...orders]);
+      await apiClient.post('/orders', orderData);
+      await loadOrders(); // Reload orders from server
       setView('list');
     } catch (error) {
       console.error('Failed to create order:', error);
+      throw error;
     }
   };
 

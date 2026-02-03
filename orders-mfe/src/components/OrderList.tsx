@@ -146,7 +146,7 @@ export function OrderList({ orders, isLoading, onViewOrder }: OrderListProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                      {order.items?.length || 0} {(order.items?.length || 0) === 1 ? 'item' : 'items'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
