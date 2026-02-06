@@ -61,6 +61,7 @@ export class BillingService {
 
   async createInvoice(data: {
     userId: string;
+    organizationId: string;
     orderId?: string;
     amount: number;
     dueDate: Date | string;
@@ -72,6 +73,7 @@ export class BillingService {
     return prisma.invoice.create({
       data: {
         userId: data.userId,
+        organizationId: data.organizationId,
         orderId: data.orderId,
         invoiceNumber,
         amount: data.amount,

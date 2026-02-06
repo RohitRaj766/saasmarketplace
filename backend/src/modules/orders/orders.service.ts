@@ -46,6 +46,7 @@ export class OrdersService {
 
   async createOrder(data: {
     userId: string;
+    organizationId: string;
     items: any[];
     totalAmount: number;
     customerName?: string;
@@ -59,6 +60,7 @@ export class OrdersService {
     const order = await prisma.order.create({
       data: {
         userId: data.userId,
+        organizationId: data.organizationId,
         orderNumber,
         items: {
           items: data.items,

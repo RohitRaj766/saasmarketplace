@@ -35,6 +35,7 @@ export class BillingController {
     try {
       const invoice = await billingService.createInvoice({
         userId: req.user!.userId,
+        organizationId: req.user!.organizationId,
         tenantId: req.user!.tenantId,
         ...req.body,
       });
