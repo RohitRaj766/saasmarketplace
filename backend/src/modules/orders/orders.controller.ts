@@ -32,6 +32,7 @@ export class OrdersController {
     try {
       const order = await ordersService.createOrder({
         userId: req.user!.userId,
+        organizationId: req.user!.organizationId,
         ...req.body,
       });
       return ResponseUtil.created(res, order, 'Order created successfully');

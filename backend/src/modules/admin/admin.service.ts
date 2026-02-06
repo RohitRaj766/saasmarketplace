@@ -82,32 +82,39 @@ export class AdminService {
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     // Create user
-    const user = await prisma.user.create({
-      data: {
-        organizationId,
-        email: data.email,
-        passwordHash,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        isOwner: false,
-        department: data.department,
-        jobTitle: data.jobTitle,
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isOwner: true,
-        department: true,
-        jobTitle: true,
-        createdAt: true,
-      },
-    });
+    try {
+      const user = await prisma.user.create({
+        data: {
+          organizationId,
+          email: data.email,
+          passwordHash,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: data.role,
+          isOwner: false,
+          department: data.department,
+          jobTitle: data.jobTitle,
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isOwner: true,
+          department: true,
+          jobTitle: true,
+          createdAt: true,
+        },
+      });
 
-    return user;
+      return user;
+    } catch (error: any) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        throw new AppError('User with this email already exists', 400);
+      }
+      throw error;
+    }
   }
 
   async updateUserRole(userId: string, role: string, organizationId: string) {

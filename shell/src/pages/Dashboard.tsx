@@ -233,7 +233,7 @@ export default function Dashboard() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {quickActions.map((action) => (
             <motion.div
               key={action.title}

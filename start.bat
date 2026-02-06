@@ -1,7 +1,18 @@
 @echo off
 echo ╔════════════════════════════════════════════════════════╗
-echo ║   OptiFlow SaaS Platform - Complete Startup           ║
+echo ║   OptiFlow SaaS Platform - Complete Startup            ║
 echo ╚════════════════════════════════════════════════════════╝
+echo.
+
+REM Kill processes on required ports
+echo 🔍 Checking for processes on required ports...
+for %%P in (3000 3001 3002 3003 3004 5000) do (
+    for /f "tokens=5" %%A in ('netstat -ano ^| findstr ":%%P "') do (
+        echo 🛑 Killing process on port %%P (PID: %%A)
+        taskkill /PID %%A /F >nul 2>&1
+    )
+)
+echo ✅ Port cleanup complete
 echo.
 
 REM Check if Docker is running
